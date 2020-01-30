@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "List of cars";
+}
+<h1>@ViewData["Title"]</h1>
+<ul>
+@foreach (Car car in Model)
+{
+    <li>
+        @car.Manufacturer  @car.Model @car.VIN 
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="EditCar" asp-route-carID="@car.Id">Edit</a>
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="AddMileage">Add Mileage</a>
+        <a class="navbar-brand" asp-area="" asp-controller="Calculations" asp-action="Calcs" asp-route-carID="@car.Id">Mileages</a>
+
+    </li>
+
+    
+}
+</ul>

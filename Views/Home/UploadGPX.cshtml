@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Upload GPX";
+}
+
+<form method="post" enctype="multipart/form-data">
+   <div class="form-group">
+        <div class="col-md-10">
+            <select id="carId" name="carID">
+            @foreach (var item in ViewBag.Cars){
+                <option value="@item.Id">@item.VIN</option>
+            }
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-10">
+            <p>Upload GPX file:</p>
+            <input type="file" name="uploadedFile" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-10">
+            <input type="submit" value="Upload" />
+        </div>
+    </div>
+</form>

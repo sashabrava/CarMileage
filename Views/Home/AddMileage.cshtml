@@ -1,0 +1,22 @@
+@model CarMileage.Models.Mileage
+@{
+    ViewData["Title"] = "Add new mileage";
+}
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+
+@Html.TextBoxFor(m => m.Date, new { @type = "Date" })
+@Html.TextBoxFor(m => m.Distance)
+@Html.TextBoxFor(m => m.OdometerMileage)
+@*Html.DropDownListFor(n => n.CarID, new SelectList(ViewBag.Cars , "CarID", "VIN"))
+@*Html.DropDownList("CarId", String.Empty)
+          @Html.ValidationMessageFor(model => model.CarID) *@  
+@*Html.DropDownListFor(m =>m.CarID, ViewBag.Cars,"Value")*@
+<select id="carId" asp-for="@Model.CarID">
+ @foreach (var item in ViewBag.Cars){
+<option value="@item.Id">@item.VIN</option>
+ }
+</select>
+       <input type="submit"/>
+</form>
