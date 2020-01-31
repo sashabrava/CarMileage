@@ -1,0 +1,13 @@
+@model CarMileage.Models.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+<h1>@ViewData["Title"]</h1>
+@if (Model != null){
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+}
+<form method="post">
+    <input type="email" asp-for="Email" />
+    <input type="password" asp-for="Password" />
+    <input type="submit"/>
+</form>

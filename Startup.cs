@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CarMileage.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace CarMileage
 {
@@ -25,6 +26,12 @@ namespace CarMileage
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<CarMileageContext>();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options => //CookieAuthenticationOptions
+        {
+            options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+        });
             services.AddControllersWithViews();
         }
 
@@ -45,8 +52,9 @@ namespace CarMileage
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
@@ -54,6 +62,6 @@ namespace CarMileage
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-         }
+        }
     }
 }
