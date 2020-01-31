@@ -12,5 +12,12 @@ namespace CarMileage.Models
         public int Distance {get;set;}
 
         public int OdometerMileage {get;set;}
+        public Mileage(DateTime Date, int OdometerMileage){
+            this.Date = Date;
+            this.OdometerMileage = OdometerMileage;
+        }
+        public Mileage(){
+            
+        }
     }
 }
