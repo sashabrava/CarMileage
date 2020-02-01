@@ -1,18 +1,30 @@
+@model List<CarMileage.Models.Car>
 @{
     ViewData["Title"] = "List of cars";
 }
 <h1>@ViewData["Title"]</h1>
-<ul>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Car</th>
+      <th scope="col">VIN</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
 @foreach (Car car in Model)
 {
-    <li>
-        @car.Manufacturer  @car.Model @car.VIN 
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="EditCar" asp-route-carID="@car.Id">Edit</a>
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="AddMileage">Add Mileage</a>
-        <a class="navbar-brand" asp-area="" asp-controller="Calculations" asp-action="Calcs" asp-route-carID="@car.Id">Mileages</a>
-
-    </li>
+    <tr>
+        <td>@car.Manufacturer  @car.Model </td>
+        <td>@car.VIN  </td>
+        <td>
+            <a class="btn btn-info btn-sm" asp-area="" asp-controller="Home" asp-action="EditCar" asp-route-carID="@car.Id">Edit</a>
+            <a class="btn btn-info btn-sm" asp-area="" asp-controller="Home" asp-action="AddMileage">Add Mileage</a>
+            <a class="btn btn-info btn-sm" asp-area="" asp-controller="Calculations" asp-action="Calcs" asp-route-carID="@car.Id">Statistics</a>
+        </td>
+    </tr>
 
     
 }
-</ul>
+  </tbody>
+</table>

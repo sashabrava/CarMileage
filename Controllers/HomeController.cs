@@ -95,7 +95,11 @@ namespace CarMileage.Controllers
         }
         public IActionResult EditCar(int carID, Car car)
         {
-            Console.WriteLine(carID);
+            if (Request.Method == "GET")
+            {
+                 if (carID > 0)
+                    return View(this.db.Cars.Where(x => x.Id == carID).First());
+            }
             if (Request.Method == "POST")
             {
                 car.Id = carID;
@@ -103,9 +107,8 @@ namespace CarMileage.Controllers
                 this.db.SaveChanges();
                 return this.RedirectToAction("Index");
             }
-            if (carID > 0)
-                return View(this.db.Cars.Where(x => x.Id == carID).First());
-            return View();
+
+            return new EmptyResult();
         }
         public IActionResult CarList()
         {
@@ -114,8 +117,9 @@ namespace CarMileage.Controllers
         }
         public IActionResult AddCar(Car car)
         {
-            if (Request.Method == "GET")
+            if (Request.Method == "GET"){
                 return View();
+            }
             else if (Request.Method == "POST")
             {
                 //Request.Form.Keys

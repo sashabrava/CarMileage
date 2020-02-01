@@ -4,11 +4,9 @@
 }
 <h1>@ViewData["Title"]</h1>
 <form method="post">
-    @*<input type="text" id="manufacturer" value="@Model.Manufacturer"/>
-    <input type="text" id="model" value="@Model.Model"/>
-    <input type="text" id="VIN" value="@Model.VIN"/>*@
+    @Html.HiddenFor(m=>m.Id)
     @Html.TextBoxFor(m => m.Manufacturer)
     @Html.TextBoxFor(m => m.Model)
     @Html.TextBoxFor(m => m.VIN)
-    <input type="submit"/>
+    <input type="submit" value="Save"/>
 </form>
