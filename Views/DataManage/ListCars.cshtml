@@ -18,8 +18,8 @@
         <td>@car.Manufacturer  @car.Model </td>
         <td>@car.VIN  </td>
         <td>
-            <a class="btn btn-info btn-sm" asp-area="" asp-controller="Home" asp-action="EditCar" asp-route-carID="@car.Id">Edit</a>
-            <a class="btn btn-info btn-sm" asp-area="" asp-controller="Home" asp-action="AddMileage">Add Mileage</a>
+            <a class="btn btn-info btn-sm" asp-area="" asp-action="EditCar" asp-route-carID="@car.Id">Edit</a>
+            <a class="btn btn-info btn-sm" asp-area="" asp-action="AddMileage">Add Mileage</a>
             <a class="btn btn-info btn-sm" asp-area="" asp-controller="Calculations" asp-action="Calcs" asp-route-carID="@car.Id">Statistics</a>
         </td>
     </tr>

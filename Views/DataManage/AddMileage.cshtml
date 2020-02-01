@@ -1,0 +1,34 @@
+@model CarMileage.Models.Mileage
+@{
+    ViewData["Title"] = "Add new mileage";
+}
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <div class="form-group row">
+        @Html.Label("Date", "Date", new {@class = "col-sm-2"})
+        @Html.TextBoxFor(m => m.Date, new { @type = "Date", @class = "form-control col-sm-5" })
+    </div>
+    <div class="form-group row">
+        @Html.Label("Distance", "Distance", new {@class = "col-sm-2"})
+        @Html.TextBoxFor(m => m.Distance, new { @class = "form-control col-sm-5" })
+    </div>
+    <div class="form-group row">
+        @Html.Label("OdometerMileage", "Odometer", new {@class = "col-sm-2"})
+        @Html.TextBoxFor(m => m.OdometerMileage, new { @class = "form-control col-sm-5" })
+    </div>
+@*<select id="carId" asp-for="@Model.CarID">
+ @foreach (var item in ViewBag.Cars){
+<option value="@item.Id">@item.VIN</option>
+ }
+</select>*@
+    <div class="form-group row ">
+        @Html.Label("CarID", "Car", new {@class = "col-sm-2"})
+        <select asp-for="CarID" 
+                asp-items="@ViewBag.Cars" class="form-control col-sm-5">
+        </select>
+    </div>
+    <div class="form-group row">
+        <input type="submit" class="btn btn-primary" />
+    </div>
+</form>

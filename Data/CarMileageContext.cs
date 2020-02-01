@@ -12,6 +12,10 @@ namespace CarMileage.Data
         {
             optionsBuilder.UseSqlite(@"Data source=data.db");
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Mileage>().HasOne(m => m.Car).WithMany(m => m.Mileages).HasForeignKey(m => m.CarID);
+        }
     }
 
 }
