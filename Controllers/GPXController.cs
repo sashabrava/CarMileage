@@ -44,13 +44,43 @@ namespace CarMileage.Controllers
         [HttpPost]
         public IActionResult UploadGPX(IFormFile uploadedFile, String carID)
         {
+            var searchPrevious = db.Mileages.Where(x => x.UploadComment.Contains(uploadedFile.FileName)).Where(x => x.CarID == Convert.ToInt32(carID));
 
+            if (searchPrevious.Count() > 0)
+            {
+                Console.WriteLine("This file has already been imported");
+                return new EmptyResult();
+            }
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(uploadedFile.ReadAsList().ToString());
-            //Convert.ToDateTime(doc.DocumentElement.GetElementsByTagName("time")[0].InnerXml);
+            double distance = CalculateDistance(doc);
+            DateTime date = Convert.ToDateTime(
+                doc.DocumentElement.GetElementsByTagName("time")[0].InnerXml).Date;
+            Mileage mileage = db.Mileages.Where(x => x.Date == date).Where(x => x.CarID == Convert.ToInt32(carID)).FirstOrDefault();
+            bool update = true;
+            if (mileage == null)
+            {
+                mileage = new Mileage();
+                update = false;
+            }
+
+            //Mileage mileage = new Mileage();
+            mileage.Distance += Convert.ToInt32(distance / 1000);
+            mileage.Date = date;
+            mileage.CarID = Convert.ToInt32(carID);
+            mileage.UploadComment += uploadedFile.FileName;
+            if (update)
+                this.db.Mileages.Update(mileage);
+            else
+                this.db.Mileages.Add(mileage);
+            this.db.SaveChanges();
+            return this.RedirectToAction("Index", "Home");
+        }
+        public double CalculateDistance(XmlDocument doc)
+        {
             var result = doc.DocumentElement.GetElementsByTagName("trkpt");
             Dictionary<string, double> lastValues =
-                new Dictionary<string, double>();
+                           new Dictionary<string, double>();
             lastValues.Add("lat", 0);
             lastValues.Add("lon", 0);
             double distance = 0;
@@ -62,14 +92,7 @@ namespace CarMileage.Controllers
                 lastValues["lon"] = Convert.ToDouble(item.Attributes["lon"].Value);
                 //Console.WriteLine(item.Attributes["lat"].Value);
             }
-            Console.WriteLine(distance.ToString());
-            Mileage mileage = new Mileage();
-            mileage.Distance = Convert.ToInt32(distance / 1000);
-            mileage.Date = Convert.ToDateTime(doc.DocumentElement.GetElementsByTagName("time")[0].InnerXml);
-            mileage.CarID = Convert.ToInt32(carID);
-            this.db.Mileages.Add(mileage);
-            this.db.SaveChanges();
-            return this.RedirectToAction("Index");
+            return distance;
         }
 
         public double GetGPS(double lat1, double lon1, double lat2, double lon2)
@@ -82,6 +105,10 @@ namespace CarMileage.Controllers
             lat2 *= DE2RA;
             lon2 *= DE2RA;
             double d = Math.Sin(lat1) * Math.Sin(lat2) + Math.Cos(lat1) * Math.Cos(lat2) * Math.Cos(lon1 - lon2);
+            if (Math.Abs(d) > 1)
+            {
+                return 0;
+            }
             return radius * Math.Acos(d);
         }
     }
