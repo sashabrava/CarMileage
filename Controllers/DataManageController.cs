@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarMileage.Controllers
 {
@@ -17,24 +19,32 @@ namespace CarMileage.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult AddCar()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult AddCar(Car car)
         {
             //Request.Form.Keys
             if (ModelState.IsValid)
             {
+                string email = ((ClaimsIdentity)User.Identity).Claims
+                    .Where(c => c.Type == ClaimTypes.Name)
+                    .Select(c => c.Value).FirstOrDefault();
+                User user = db.Users.Where(x => x.Email == email).First();
+                car.Owner = user;
                 this.db.Cars.Add(car);
                 this.db.SaveChanges();
-                return this.RedirectToAction("Index");
+                return this.RedirectToAction("Index", "Home");
             }
             return new EmptyResult();
         }
         [HttpGet]
+        [Authorize]
         public IActionResult EditCar(int carID)
         {
             if (carID > 0)
@@ -42,6 +52,7 @@ namespace CarMileage.Controllers
             return new EmptyResult();
         }
         [HttpPost]
+        [Authorize]
         public IActionResult EditCar(Car car)
         {
             this.db.Cars.Update(car);
@@ -50,10 +61,27 @@ namespace CarMileage.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult ListCars()
         {
+            string role = ((ClaimsIdentity)User.Identity).Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value).FirstOrDefault();
+            string email = ((ClaimsIdentity)User.Identity).Claims
+                .Where(c => c.Type == ClaimTypes.Name)
+                .Select(c => c.Value).FirstOrDefault();
 
-            return View(this.db.Cars.ToList());
+            if (role == "admin")
+            {
+                ViewBag.AdminMessage = "You are viewing this page as administrator";
+                return View(this.db.Cars.ToList());
+            }
+            else
+            {
+                User user = db.Users.Where(x => x.Email == email).First();
+                return View(this.db.Cars.Where(x => x.Owner == user).ToList());
+            }
+
         }
         [HttpGet]
         public IActionResult AddMileage()
@@ -78,7 +106,7 @@ namespace CarMileage.Controllers
                 this.db.Mileages.Add(mileage);
                 this.db.SaveChanges();
 
-                return this.RedirectToAction("Index");
+                return this.RedirectToAction("Index", "Home");
             }
             return new EmptyResult();
         }

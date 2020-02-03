@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using CarMileage.Models;
 using CarMileage.Data;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +32,7 @@ namespace CarMileage.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    User user = this.db.Users.FirstOrDefault(x => x.Email == loginModel.Email && x.Password == loginModel.Password);
+                    User user = this.db.Users.Include("Role").FirstOrDefault(x => x.Email == loginModel.Email && x.Password == loginModel.Password);
                     if (user != null)
                     {
                         await Authenticate(user);
@@ -54,7 +55,8 @@ namespace CarMileage.Controllers
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Name)
             };
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));

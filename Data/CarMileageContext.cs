@@ -15,6 +15,9 @@ namespace CarMileage.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Mileage>().HasOne(m => m.Car).WithMany(m => m.Mileages).HasForeignKey(m => m.CarID);
+            modelBuilder.Entity<User>().HasOne(m => m.Role).WithMany(m => m.Users).HasForeignKey(m => m.RoleId);
+            modelBuilder.Entity<Car>().HasOne(m => m.Owner).WithMany();
+
         }
     }
 

@@ -3,6 +3,10 @@
     ViewData["Title"] = "List of cars";
 }
 <h1>@ViewData["Title"]</h1>
+
+@if (@ViewBag.AdminMessage != null){
+  <p>@ViewBag.AdminMessage</p>
+}
 <table class="table">
   <thead>
     <tr>
