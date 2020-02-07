@@ -17,5 +17,13 @@
         @Html.Label("VIN", "VIN", new {@class = "col-sm-2"})
         @Html.TextBoxFor(m => m.VIN, new { @class = "form-control col-sm-5" })
     </div>
+    @if (ViewBag.HasAdminRights == true){
+    <div class="form-group row">
+        @Html.Label("Owner", "Owner", new {@class = "col-sm-2"})
+        <select asp-for="OwnerId" 
+                asp-items="@ViewBag.Users" class="form-control col-sm-5">
+        </select>
+    </div>
+    }
     <input type="submit" value="Save" class="btn btn-primary"/>
 </form>

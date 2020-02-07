@@ -3,6 +3,7 @@ using CarMileage.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Security.Claims;
@@ -32,10 +33,7 @@ namespace CarMileage.Controllers
             //Request.Form.Keys
             if (ModelState.IsValid)
             {
-                string email = ((ClaimsIdentity)User.Identity).Claims
-                    .Where(c => c.Type == ClaimTypes.Name)
-                    .Select(c => c.Value).FirstOrDefault();
-                User user = db.Users.Where(x => x.Email == email).First();
+                User user = db.Users.Where(x => x.Email == User.Identity.Name).First();
                 car.Owner = user;
                 this.db.Cars.Add(car);
                 this.db.SaveChanges();
@@ -43,14 +41,26 @@ namespace CarMileage.Controllers
             }
             return new EmptyResult();
         }
+
         [HttpGet]
         [Authorize]
         public IActionResult EditCar(int carID)
         {
-            if (carID > 0)
-                return View(this.db.Cars.Where(x => x.Id == carID).First());
-            return new EmptyResult();
+            Car car = this.db.Cars.Where(x => x.Id == carID).FirstOrDefault();
+            User user = db.Users.Where(x => x.Email == User.Identity.Name).First();
+            if (car == null)
+                return NotFound();
+            if (HasAdminRights(User))
+            {
+                ViewBag.Users = new SelectList(db.Users.ToList(), "Id", "Email");
+                ViewBag.HasAdminRights = true;
+                return View(car);
+            }
+            if (car.Owner == user)
+                return View(car);
+            else return StatusCode(403);
         }
+
         [HttpPost]
         [Authorize]
         public IActionResult EditCar(Car car)
@@ -64,21 +74,15 @@ namespace CarMileage.Controllers
         [Authorize]
         public IActionResult ListCars()
         {
-            string role = ((ClaimsIdentity)User.Identity).Claims
-                .Where(c => c.Type == ClaimTypes.Role)
-                .Select(c => c.Value).FirstOrDefault();
-            string email = ((ClaimsIdentity)User.Identity).Claims
-                .Where(c => c.Type == ClaimTypes.Name)
-                .Select(c => c.Value).FirstOrDefault();
-
-            if (role == "admin")
+            if (HasAdminRights(User))
             {
+                ViewBag.HasAdminRights = true;
                 ViewBag.AdminMessage = "You are viewing this page as administrator";
-                return View(this.db.Cars.ToList());
+                return View(this.db.Cars.Include(e => e.Owner).ToList());
             }
             else
             {
-                User user = db.Users.Where(x => x.Email == email).First();
+                User user = db.Users.Where(x => x.Email == User.Identity.Name).First();
                 return View(this.db.Cars.Where(x => x.Owner == user).ToList());
             }
 
@@ -109,6 +113,15 @@ namespace CarMileage.Controllers
                 return this.RedirectToAction("Index", "Home");
             }
             return new EmptyResult();
+        }
+        private bool HasAdminRights(ClaimsPrincipal User)
+        {
+            string role = ((ClaimsIdentity)User.Identity).Claims
+                 .Where(c => c.Type == ClaimTypes.Role)
+                 .Select(c => c.Value).FirstOrDefault();
+            if (role == "admin")
+                return true;
+            return false;
         }
     }
 }

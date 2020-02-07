@@ -10,7 +10,7 @@ namespace CarMileage.Models
         public string VIN { get; set; }
 
         public User Owner { get; set; }
-
+        public int OwnerId { get; set; }
         public List<Mileage> Mileages { get; set; }
     }
 }

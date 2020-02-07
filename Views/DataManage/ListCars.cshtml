@@ -12,6 +12,9 @@
     <tr>
       <th scope="col">Car</th>
       <th scope="col">VIN</th>
+      @if (ViewBag.HasAdminRights == true){
+          <th scope="col">Owner</th>
+      }
       <th scope="col">Actions</th>
     </tr>
   </thead>
@@ -21,6 +24,9 @@
     <tr>
         <td>@car.Manufacturer  @car.Model </td>
         <td>@car.VIN  </td>
+        @if (ViewBag.HasAdminRights == true){
+          <td>@car.Owner?.Email</td>
+        }
         <td>
             <a class="btn btn-info btn-sm" asp-area="" asp-action="EditCar" asp-route-carID="@car.Id">Edit</a>
             <a class="btn btn-info btn-sm" asp-area="" asp-action="AddMileage">Add Mileage</a>
