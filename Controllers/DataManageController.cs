@@ -6,7 +6,6 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CarMileage.Controllers
@@ -50,7 +49,7 @@ namespace CarMileage.Controllers
             User user = db.Users.Where(x => x.Email == User.Identity.Name).First();
             if (car == null)
                 return NotFound();
-            if (HasAdminRights(User))
+            if (AccountController.HasAdminRights(User))
             {
                 ViewBag.Users = new SelectList(db.Users.ToList(), "Id", "Email");
                 ViewBag.HasAdminRights = true;
@@ -74,7 +73,7 @@ namespace CarMileage.Controllers
         [Authorize]
         public IActionResult ListCars()
         {
-            if (HasAdminRights(User))
+            if (AccountController.HasAdminRights(User))
             {
                 ViewBag.HasAdminRights = true;
                 ViewBag.AdminMessage = "You are viewing this page as administrator";
@@ -88,10 +87,17 @@ namespace CarMileage.Controllers
 
         }
         [HttpGet]
+        [Authorize]
         public IActionResult AddMileage()
         {
-
-            List<Car> cars = this.db.Cars.ToList();
+            List<Car> cars;
+            if (AccountController.HasAdminRights(User))
+                cars = this.db.Cars.ToList();
+            else
+            {
+                User user = db.Users.Where(x => x.Email == User.Identity.Name).First();
+                cars = this.db.Cars.Where(m => m.Owner == user).ToList();
+            }
             var selectList = from c in cars
                              select new SelectListItem
                              {
@@ -113,15 +119,6 @@ namespace CarMileage.Controllers
                 return this.RedirectToAction("Index", "Home");
             }
             return new EmptyResult();
-        }
-        private bool HasAdminRights(ClaimsPrincipal User)
-        {
-            string role = ((ClaimsIdentity)User.Identity).Claims
-                 .Where(c => c.Type == ClaimTypes.Role)
-                 .Select(c => c.Value).FirstOrDefault();
-            if (role == "admin")
-                return true;
-            return false;
         }
     }
 }

@@ -62,6 +62,14 @@ namespace CarMileage.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
 
         }
-
+        static public bool HasAdminRights(ClaimsPrincipal User)
+        {
+            string role = ((ClaimsIdentity)User.Identity).Claims
+                 .Where(c => c.Type == ClaimTypes.Role)
+                 .Select(c => c.Value).FirstOrDefault();
+            if (role == "admin")
+                return true;
+            return false;
+        }
     }
 }

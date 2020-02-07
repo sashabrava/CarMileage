@@ -3,7 +3,7 @@ using CarMileage.Models;
 using CarMileage.Data;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace CarMileage.Controllers
@@ -16,23 +16,33 @@ namespace CarMileage.Controllers
         private CarMileageContext db;
 
         [Route("{carID}")]
+        [HttpGet]
+        [Authorize]
         public IActionResult Calcs(int carID)
         {
-            List<Mileage> mileages = this.db.Mileages.Where(s => s.CarID == carID).OrderBy(s => s.Date).ToList();
-            Dictionary<string, object> dict = new Dictionary<string, object>();
-            if (mileages.Where(s => s.OdometerMileage > 0).Count() < 2)
+            Car car = this.db.Cars.Where(x => x.Id == carID).FirstOrDefault();
+            User user = db.Users.Where(x => x.Email == User.Identity.Name).First();
+            if (car == null)
+                return NotFound();
+            if (car.Owner == user || AccountController.HasAdminRights(User))
             {
-                dict["Message"] = "Car doesn't have enough info about odometer";
-            }
+                List<Mileage> mileages = this.db.Mileages.Where(s => s.CarID == carID).OrderBy(s => s.Date).ToList();
+                Dictionary<string, object> dict = new Dictionary<string, object>();
+                if (mileages.Where(s => s.OdometerMileage > 0).Count() < 2)
+                {
+                    dict["Message"] = "Car doesn't have enough info about odometer";
+                }
 
-            else
-            {
-                dict["DayMileage"] = mileages.Where(s => s.Distance > 0).ToList();
-                dict["OdometerMileage"] = mileages.Where(s => s.OdometerMileage > 0).ToList();
-                dict["ChartDay"] = chartDailyMileage(mileages.Where(s => s.Distance > 0).ToList());
-                dict["chartOverall"] = chartOverallMileage(calculateAverageDistance(mileages));
+                else
+                {
+                    dict["DayMileage"] = mileages.Where(s => s.Distance > 0).ToList();
+                    dict["OdometerMileage"] = mileages.Where(s => s.OdometerMileage > 0).ToList();
+                    dict["ChartDay"] = chartDailyMileage(mileages.Where(s => s.Distance > 0).ToList());
+                    dict["chartOverall"] = chartOverallMileage(calculateAverageDistance(mileages));
+                }
+                return View(dict);
             }
-            return View(dict);
+            else return StatusCode(403);
         }
         public CalculationsController()
         {
@@ -48,7 +58,6 @@ namespace CarMileage.Controllers
                 dict["x"] = mileage.Date.ToString();
                 dict["y"] = mileage.OdometerMileage;
                 list.Add(dict);
-
             }
             return list;
         }

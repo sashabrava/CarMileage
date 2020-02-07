@@ -8,6 +8,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarMileage.Controllers
 {
@@ -34,11 +35,17 @@ namespace CarMileage.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult UploadGPX()
         {
-            ViewBag.Cars = this.db.Cars.ToList();
+            if (AccountController.HasAdminRights(User))
+                ViewBag.Cars = this.db.Cars.ToList();
+            else
+            {
+                User user = db.Users.Where(x => x.Email == User.Identity.Name).First();
+                ViewBag.Cars = this.db.Cars.Where(m => m.Owner == user).ToList();
+            }
             return View();
-
         }
 
         [HttpPost]

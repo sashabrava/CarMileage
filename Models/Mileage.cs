@@ -18,9 +18,10 @@ namespace CarMileage.Models
         public Mileage(DateTime Date, int OdometerMileage){
             this.Date = Date;
             this.OdometerMileage = OdometerMileage;
+            this.UploadComment = "";
         }
         public Mileage(){
-            
+            this.UploadComment = "";
         }
     }
 }
