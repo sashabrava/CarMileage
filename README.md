@@ -10,3 +10,10 @@ Usage notes:
 - Admin can change User-owner of car.
 
 <img src="https://user-images.githubusercontent.com/11160215/74155613-2d85f780-4c15-11ea-9095-c82d73c9a571.png" alt="index" width="70%" />
+
+Calculating mileage statistics works the following way:
+1. Algorithm finds two User-specified odometer counters.
+2. Searches for all User-specified daily mileages between those counters.
+3. Calculates average daily mileage (excluding User-specified daily mileages).
+4. Calculates predicted odometer counters the day before and the day after each User-specified daily mileage.
+
