@@ -8,6 +8,7 @@ Usage notes:
 - User can add their car mileage manually or by uploading GPX tracks. Algorithm calculates track distance and adds it to car's mileage at that day. Same file can't be uploaded multiple times for 1 car.
 - Admin can change the owner of car and view/edit cars of all users, change mileage of any car.
 - Admin can change User-owner of car.
+- User password can be generated via Security.generatePassword method.
 
 <img src="https://user-images.githubusercontent.com/11160215/74155613-2d85f780-4c15-11ea-9095-c82d73c9a571.png" alt="edit_car" width="70%" />
 
