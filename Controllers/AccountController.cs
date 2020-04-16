@@ -32,15 +32,19 @@ namespace CarMileage.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    User user = this.db.Users.Include("Role").FirstOrDefault(x => x.Email == loginModel.Email && x.Password == loginModel.Password);
-                    if (user != null)
+                    User user = this.db.Users.Include("Role").FirstOrDefault(x => x.Email == loginModel.Email);
+                    if (user != null && Security.checkPassword(loginModel.Password, user.Password))
                     {
                         await Authenticate(user);
                         return RedirectToAction("Index", "Home");
                     }
+                    else
+                    {
+                        ModelState.AddModelError("", "Incorrect username or password");
+                    }
                 }
                 else
-                    ModelState.AddModelError("", "Incorrect login or password");
+                    ModelState.AddModelError("", "Incorrect form data");
             }
             return View(loginModel);
         }
